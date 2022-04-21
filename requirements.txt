@@ -1,4 +1,4 @@
-Flask==2.0.3
+Flask==2.1.1
 flask_bcrypt==1.0.1
 flask_login==0.6.0
 flask_mail==0.9.1
