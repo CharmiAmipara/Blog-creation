@@ -1,0 +1,40 @@
+{% extends 'layout.html' %}
+{% block content %}
+		<article class="media content-section">
+		  <img class="rounded-circle article-img" src="{{ url_for('static', filename='IMG/' + post.author.img) }}">
+		  <div class="media-body">
+		    <div class="article-metadata row" >
+		      <div class="col">
+		      	<a class="mr-2" href="{{ url_for('users.user_posts', username=post.author.username) }}">{{ post.author.username }}</a>
+		      	<small class="text-muted">{{ post.date_posted.strftime('%Y-%m-%d') }}</small>
+		      </div>
+		      <div class="col d-md-flex justify-content-md-end">
+			      {% if post.author == current_user %}
+			        <a class="btn btn-outline-secondary btn-sm m-1 me-md-2" href="{{ url_for('posts.updatepost', post_id=post.id) }}">Update</a>
+			        <button type="button" class="btn btn-outline-danger btn-sm m-1" data-bs-toggle="modal" data-bs-target="#deleteModal">Delete</button>
+			      {% endif %}
+		      </div>
+		    </div>
+		    <h3 class="article-title">{{ post.title }}</h3>
+		    <p class="article-content">{{ post.content }}</p>
+		  </div>
+		</article>
+		<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+		  <div class="modal-dialog">
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <h5 class="modal-title" id="deleteModalLabel">Delete Blog ?</h5>
+		        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+		      </div>
+		      <div class="modal-body">
+		        This will permanently delete your Blog.
+		      </div>
+		      <div class="modal-footer">
+		      	<form action="{{ url_for('posts.deletepost', post_id=post.id) }}" method="POST">
+		          <input type="submit" class="btn btn-outline-danger" value="Delete">
+		        </form>
+		      </div>
+		    </div>
+		  </div>
+		</div>
+{% endblock %}
