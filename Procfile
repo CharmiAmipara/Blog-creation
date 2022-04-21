@@ -1,1 +1,1 @@
-web: gunicorm wsgi:app
+web: gunicorm app:__init__
