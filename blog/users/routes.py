@@ -1,9 +1,9 @@
 from flask import render_template, url_for, flash, redirect, request, abort, Blueprint
 from blog import db, bcrypt
-from blog.users.forms import Reg, Login, Update, RequestReset, ResetPass
+from blog.users.forms import Reg, Login, Update
 from blog.models import User, Post
 from flask_login import login_user, current_user, logout_user, login_required
-from blog.users.utils import save_pic, send_email
+from blog.users.utils import save_pic
 
 users = Blueprint('users', __name__)
 
@@ -65,42 +65,4 @@ def user_posts(username):
 	user = User.query.filter_by(username=username).first_or_404()
 	posts = Post.query.filter_by(author=user).order_by(Post.date_posted.desc()).paginate(page=page, per_page=3)
 	return render_template('user_posts.html' , posts=posts, user=user  )
-
-
-@users.route('/reset_password', methods=['GET', 'POST'])
-def req_reset():
-	if current_user.is_authenticated:
-		return redirect(url_for('main.home'))
-
-	form = RequestReset()
-	if form.validate_on_submit():
-		user = User.query.filter_by(email = form.email.data).first()
-		send_email(user)
-		flash('Email has been sent to reset password', category='info')
-		return redirect(url_for('users.login'))
-	return render_template('req_reset.html', title='Reset Password', form=form)
-
-@users.route('/reset_password/<token>', methods=['GET', 'POST'])
-def token_reset(token):
-	if current_user.is_authenticated:
-		return redirect(url_for('main.home'))
-
-	user = User.verify_reset_token(token)
-	if user is None:
-		flask('This token is invalid or has been expired!', category='warning')
-		return redirect(url_for('users.req_reset'))
-
-	form = ResetPass()
-	if form.validate_on_submit():
-		hash_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-		user.password = hash_password
-		db.session.commit()
-		flash('Password has been updated! Log in to access your account!', category='success')
-		return redirect(url_for('users.login'))
-	return render_template('token_reset.html', title='Reset Password', form=form)
-
-
-
-
-
 
